@@ -1,142 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>LevelUp — Ad Rotator 845x314</title>
+<script>
+  // ==============================
+  //  AD CONFIG — EDIT THIS SECTION
+  // ==============================
 
-  <!-- Try to prevent caching on the players -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-
-  <meta name="viewport" content="width=845, height=314, initial-scale=1.0, maximum-scale=1.0" />
-
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  var ADS = [
+    {
+      image: "ads/2025-09-23 Eber Insurance-2[75].jpg",
+      seconds: 10,
+      bgColor: "#ffffff"
+    },
+    {
+      image: "ads/Bar and Grill.png",
+      seconds: 10,
+      bgColor: "#001B53"
+    },
+    {
+      image: "ads/Comcast CB_LevelUp-PickleBall_Sponsor-ENT_LED-Sign_845x314_10.25_Final.jpg",
+      seconds: 10,
+      bgColor: "#0033cc"
+    },
+    {
+      image: "ads/Digital Billboard (15).png",
+      seconds: 10,
+      bgColor: "#004b8d"
+    },
+    {
+      image: "ads/Kitchen Play 8.jpg",
+      seconds: 10,
+      bgColor: "#1f2937"
+    },
+    {
+      image: "ads/Lifeline Physical Therapy_Aches-and-Pains_Sept25.png",
+      seconds: 10,
+      bgColor: "#004a7c"
+    },
+    {
+      image: "ads/logo[67].jpg",
+      seconds: 30,
+      bgColor: "#f5ebd2"
+    },
+    {
+      image: "ads/SCG_Level Up Pickleball_MissionMovement_845x314.jpg",
+      seconds: 10,
+      bgColor: "#002e5d"
     }
+  ];
 
-    /* Main canvas — matches your LED layout */
-    #ad-root {
-      width: 845px;
-      height: 314px;
-      box-sizing: border-box;
-      overflow: hidden;
-    }
+  // Default display time if not defined
+  var DEFAULT_SECONDS = 10;
 
-    /* Scale nicely if you preview on a different screen */
-    @media (max-width: 845px) {
-      #ad-root {
-        width: 100vw;
-        height: calc(100vw * (314 / 845));
+  // ==============================
+  //  ROTATION LOGIC — DO NOT EDIT
+  // ==============================
+
+  (function () {
+    var index = 0;
+    var timerId = null;
+
+    var slideEl = document.getElementById("ad-slide");
+    var loadingEl = document.getElementById("loading");
+    var imgEl = document.getElementById("ad-image");
+
+    function preloadImages(list, callback) {
+      var remaining = 0;
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].image) remaining++;
       }
-    }
+      if (remaining === 0) return callback();
 
-    .ad-slide {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: #ffffff;
-      padding: 8px;
-      box-sizing: border-box;
-    }
-
-    .ad-image-wrapper {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      max-height: 100%;
-      width: 100%;
-    }
-
-    .ad-image-wrapper img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      display: block;
-    }
-
-    .ad-text {
-      width: 100%;
-      font-size: 24px;
-      font-weight: 700;
-      line-height: 1.1;
-      padding-top: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .ad-subtext {
-      width: 100%;
-      font-size: 18px;
-      line-height: 1.1;
-      padding-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .loading {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #aaa;
-      font-size: 20px;
-    }
-  </style>
-</head>
-<body>
-  <div id="ad-root">
-    <div id="loading" class="loading">Loading ads…</div>
-    <div id="ad-slide" class="ad-slide" style="display:none;">
-      <div class="ad-image-wrapper">
-        <img id="ad-image" src="" alt="" />
-      </div>
-      <div id="ad-text" class="ad-text"></div>
-      <div id="ad-subtext" class="ad-subtext"></div>
-    </div>
-  </div>
-
-  <script>
-    // ==============================
-    //  SIMPLE AD CONFIG (EDIT THIS)
-    // ==============================
-    //
-    // seconds: how long each ad stays on screen
-    // image:   filename or URL (relative to this HTML file is easiest)
-    // text:    big text line (optional)
-    // subtext: smaller line (optional)
-    // bgColor: background color for that slide (optional)
-
-    var ADS = [
-      {
-        image: "ads/intro.png",
-        text: "Welcome to LevelUp Pickleball Club!",
-        subtext: "Check out this week’s events in the app.",
-        seconds: 10,
-        bgColor: "#101820"
-      },
-      {
-        image: "ads/memberships.png",
-        text: "Upgrade to a Gold Membership",
-        subtext: "Priority court bookings & more perks.",
-        seconds: 8,
-        bgColor: "#004b8d"
-      },
-      {
-        image: "ads/clinics.png",
-        text: "Weekend Clinics & Dr
+      list.forEach(function (ad) {
+        if (!ad.image) return;
+        var img =
