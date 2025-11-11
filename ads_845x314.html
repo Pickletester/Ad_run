@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LevelUp — Ad Rotator 845x314</title>
+
+  <!-- Try to prevent caching on the players -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <meta name="viewport" content="width=845, height=314, initial-scale=1.0, maximum-scale=1.0" />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    /* Main canvas — matches your LED layout */
+    #ad-root {
+      width: 845px;
+      height: 314px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    /* Scale nicely if you preview on a different screen */
+    @media (max-width: 845px) {
+      #ad-root {
+        width: 100vw;
+        height: calc(100vw * (314 / 845));
+      }
+    }
+
+    .ad-slide {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #ffffff;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    .ad-image-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-height: 100%;
+      width: 100%;
+    }
+
+    .ad-image-wrapper img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .ad-text {
+      width: 100%;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.1;
+      padding-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ad-subtext {
+      width: 100%;
+      font-size: 18px;
+      line-height: 1.1;
+      padding-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .loading {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="ad-root">
+    <div id="loading" class="loading">Loading ads…</div>
+    <div id="ad-slide" class="ad-slide" style="display:none;">
+      <div class="ad-image-wrapper">
+        <img id="ad-image" src="" alt="" />
+      </div>
+      <div id="ad-text" class="ad-text"></div>
+      <div id="ad-subtext" class="ad-subtext"></div>
+    </div>
+  </div>
+
+  <script>
+    // ==============================
+    //  SIMPLE AD CONFIG (EDIT THIS)
+    // ==============================
+    //
+    // seconds: how long each ad stays on screen
+    // image:   filename or URL (relative to this HTML file is easiest)
+    // text:    big text line (optional)
+    // subtext: smaller line (optional)
+    // bgColor: background color for that slide (optional)
+
+    var ADS = [
+      {
+        image: "ads/intro.png",
+        text: "Welcome to LevelUp Pickleball Club!",
+        subtext: "Check out this week’s events in the app.",
+        seconds: 10,
+        bgColor: "#101820"
+      },
+      {
+        image: "ads/memberships.png",
+        text: "Upgrade to a Gold Membership",
+        subtext: "Priority court bookings & more perks.",
+        seconds: 8,
+        bgColor: "#004b8d"
+      },
+      {
+        image: "ads/clinics.png",
+        text: "Weekend Clinics & Dr
