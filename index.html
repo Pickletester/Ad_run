@@ -1,73 +1,94 @@
 <script>
-  // ==============================
-  //  AD CONFIG — EDIT THIS SECTION
-  // ==============================
-
   var ADS = [
     {
-      image: "ads/2025-09-23 Eber Insurance-2[75].jpg",
-      seconds: 10,
+      image: "Ads/2025-09-23 Eber Insurance-2[75].jpg",
+      seconds: 12,
       bgColor: "#ffffff"
     },
     {
-      image: "ads/Bar and Grill.png",
+      image: "Ads/Bar and Grill.png",
       seconds: 10,
       bgColor: "#001B53"
     },
     {
-      image: "ads/Comcast CB_LevelUp-PickleBall_Sponsor-ENT_LED-Sign_845x314_10.25_Final.jpg",
-      seconds: 10,
+      image: "Ads/Comcast CB_LevelUp-PickleBall_Sponsor-ENT_LED-Sign_845x314_10.25_Final.jpg",
+      seconds: 12,
       bgColor: "#0033cc"
     },
     {
-      image: "ads/Digital Billboard (15).png",
-      seconds: 10,
+      image: "Ads/Digital Billboard (15).png",
+      seconds: 12,
       bgColor: "#004b8d"
     },
     {
-      image: "ads/Kitchen Play 8.jpg",
+      image: "Ads/Kitchen Play 8.jpg",
       seconds: 10,
       bgColor: "#1f2937"
     },
     {
-      image: "ads/Lifeline Physical Therapy_Aches-and-Pains_Sept25.png",
+      image: "Ads/Lifeline Physical Therapy_Aches-and-Pains_Sept25.png",
       seconds: 10,
       bgColor: "#004a7c"
     },
     {
-      image: "ads/logo[67].jpg",
-      seconds: 30,
+      image: "Ads/logo[67].jpg",
+      seconds: 8,
       bgColor: "#f5ebd2"
     },
     {
-      image: "ads/SCG_Level Up Pickleball_MissionMovement_845x314.jpg",
-      seconds: 10,
+      image: "Ads/SCG_Level Up Pickleball_MissionMovement_845x314.jpg",
+      seconds: 12,
       bgColor: "#002e5d"
     }
   ];
 
-  // Default display time if not defined
   var DEFAULT_SECONDS = 10;
-
-  // ==============================
-  //  ROTATION LOGIC — DO NOT EDIT
-  // ==============================
 
   (function () {
     var index = 0;
     var timerId = null;
-
     var slideEl = document.getElementById("ad-slide");
     var loadingEl = document.getElementById("loading");
     var imgEl = document.getElementById("ad-image");
 
     function preloadImages(list, callback) {
       var remaining = 0;
-      for (var i = 0; i < list.length; i++) {
-        if (list[i].image) remaining++;
-      }
+      for (var i = 0; i < list.length; i++) if (list[i].image) remaining++;
       if (remaining === 0) return callback();
-
       list.forEach(function (ad) {
         if (!ad.image) return;
-        var img =
+        var img = new Image();
+        img.onload = img.onerror = function () {
+          remaining--;
+          if (remaining <= 0) callback();
+        };
+        img.src = ad.image;
+      });
+    }
+
+    function showAd(idx) {
+      if (!ADS || ADS.length === 0) {
+        loadingEl.innerHTML = "No ads configured.";
+        return;
+      }
+      var ad = ADS[idx];
+      slideEl.style.backgroundColor = ad.bgColor || "#000";
+      imgEl.src = ad.image;
+      loadingEl.style.display = "none";
+      slideEl.style.display = "flex";
+
+      var seconds = parseFloat(ad.seconds);
+      if (isNaN(seconds) || seconds <= 0) seconds = DEFAULT_SECONDS;
+
+      clearTimeout(timerId);
+      timerId = setTimeout(function () {
+        index = (index + 1) % ADS.length;
+        showAd(index);
+      }, seconds * 1000);
+    }
+
+    preloadImages(ADS, function () {
+      showAd(0);
+    });
+  })();
+</script>
