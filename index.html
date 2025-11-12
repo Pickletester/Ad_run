@@ -1,94 +1,151 @@
-<script>
-  var ADS = [
-    {
-      image: "Ads/2025-09-23 Eber Insurance-2[75].jpg",
-      seconds: 12,
-      bgColor: "#ffffff"
-    },
-    {
-      image: "Ads/Bar and Grill.png",
-      seconds: 10,
-      bgColor: "#001B53"
-    },
-    {
-      image: "Ads/Comcast CB_LevelUp-PickleBall_Sponsor-ENT_LED-Sign_845x314_10.25_Final.jpg",
-      seconds: 12,
-      bgColor: "#0033cc"
-    },
-    {
-      image: "Ads/Digital Billboard (15).png",
-      seconds: 12,
-      bgColor: "#004b8d"
-    },
-    {
-      image: "Ads/Kitchen Play 8.jpg",
-      seconds: 10,
-      bgColor: "#1f2937"
-    },
-    {
-      image: "Ads/Lifeline Physical Therapy_Aches-and-Pains_Sept25.png",
-      seconds: 10,
-      bgColor: "#004a7c"
-    },
-    {
-      image: "Ads/logo[67].jpg",
-      seconds: 8,
-      bgColor: "#f5ebd2"
-    },
-    {
-      image: "Ads/SCG_Level Up Pickleball_MissionMovement_845x314.jpg",
-      seconds: 12,
-      bgColor: "#002e5d"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LevelUp — LED Ad Rotator</title>
+
+  <!-- Prevent caching -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <!-- Match LED resolution -->
+  <meta name="viewport" content="width=845, height=314, initial-scale=1.0, maximum-scale=1.0" />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
     }
-  ];
 
-  var DEFAULT_SECONDS = 10;
+    #ad-root {
+      width: 845px;
+      height: 314px;
+      position: relative;
+      overflow: hidden;
+    }
 
-  (function () {
-    var index = 0;
-    var timerId = null;
-    var slideEl = document.getElementById("ad-slide");
-    var loadingEl = document.getElementById("loading");
-    var imgEl = document.getElementById("ad-image");
+    .ad-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      background-color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-    function preloadImages(list, callback) {
-      var remaining = 0;
-      for (var i = 0; i < list.length; i++) if (list[i].image) remaining++;
-      if (remaining === 0) return callback();
-      list.forEach(function (ad) {
-        if (!ad.image) return;
-        var img = new Image();
-        img.onload = img.onerror = function () {
-          remaining--;
-          if (remaining <= 0) callback();
+    .ad-slide.active {
+      opacity: 1;
+      z-index: 1;
+    }
+
+    .ad-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      background: #000;
+      font-family: sans-serif;
+      font-size: 20px;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="ad-root">
+    <div id="loading" class="loading">Loading ads...</div>
+  </div>
+
+  <script>
+    // ==============================
+    // AD CONFIGURATION
+    // ==============================
+    const ADS = [
+      { image: "Ads/ad1.jpg", seconds: 10 },
+      { image: "Ads/ad2.png", seconds: 10 },
+      { image: "Ads/ad3.jpg", seconds: 10 },
+      { image: "Ads/ad4.png", seconds: 10 },
+      { image: "Ads/ad5.jpg", seconds: 10 },
+      { image: "Ads/ad6.png", seconds: 10 },
+      { image: "Ads/ad7.jpg", seconds: 10 },
+      { image: "Ads/ad8.jpg", seconds: 10 }
+    ];
+
+    const DEFAULT_SECONDS = 10;
+
+    const root = document.getElementById("ad-root");
+    const loader = document.getElementById("loading");
+
+    // ==============================
+    // PRELOAD IMAGES
+    // ==============================
+    function preloadImages(ads, callback) {
+      let loaded = 0;
+      ads.forEach(ad => {
+        const img = new Image();
+        img.onload = img.onerror = () => {
+          loaded++;
+          if (loaded === ads.length) callback();
         };
         img.src = ad.image;
       });
     }
 
-    function showAd(idx) {
-      if (!ADS || ADS.length === 0) {
-        loadingEl.innerHTML = "No ads configured.";
-        return;
-      }
-      var ad = ADS[idx];
-      slideEl.style.backgroundColor = ad.bgColor || "#000";
-      imgEl.src = ad.image;
-      loadingEl.style.display = "none";
-      slideEl.style.display = "flex";
-
-      var seconds = parseFloat(ad.seconds);
-      if (isNaN(seconds) || seconds <= 0) seconds = DEFAULT_SECONDS;
-
-      clearTimeout(timerId);
-      timerId = setTimeout(function () {
-        index = (index + 1) % ADS.length;
-        showAd(index);
-      }, seconds * 1000);
+    // ==============================
+    // INITIALIZE SLIDES
+    // ==============================
+    function initSlides() {
+      ADS.forEach((ad, i) => {
+        const slide = document.createElement("div");
+        slide.className = "ad-slide";
+        const img = document.createElement("img");
+        img.src = ad.image;
+        slide.appendChild(img);
+        root.appendChild(slide);
+      });
+      loader.style.display = "none";
+      startRotation();
     }
 
-    preloadImages(ADS, function () {
-      showAd(0);
-    });
-  })();
-</script>
+    // ==============================
+    // ROTATION LOGIC
+    // ==============================
+    let current = 0;
+    function startRotation() {
+      const slides = document.querySelectorAll(".ad-slide");
+      if (slides.length === 0) return;
+
+      function showNext() {
+        slides.forEach((s, i) => s.classList.toggle("active", i === current));
+        const delay = (ADS[current].seconds || DEFAULT_SECONDS) * 1000;
+        current = (current + 1) % slides.length;
+        setTimeout(showNext, delay);
+      }
+
+      showNext();
+    }
+
+    preloadImages(ADS, initSlides);
+  </script>
+</body>
+</html>
